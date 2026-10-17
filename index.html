@@ -131,8 +131,17 @@
 <div class="win-modal" id="win-modal">
     <div class="win-content">
         <div class="win-title">выпало:</div>
-        <div class="win-items" id="win-items-container"></div>
-        <button class="close-win-btn" onclick="closeWinModal()">Забрать</button>
+        <div class="win-items-scroll">
+            <div class="win-items" id="win-items-container"></div>
+        </div>
+    </div>
+    <div class="win-bottom-panel">
+        <button class="win-action-btn claim-btn" id="win-claim-btn" onclick="claimAllToInventory()">
+            🎒 Забрать в инвентарь
+        </button>
+        <button class="win-action-btn sell-all-btn" id="win-sell-btn" onclick="sellAllWonItems()">
+            💰 Продать всё
+        </button>
     </div>
 </div>
 <style>
@@ -218,16 +227,27 @@
 .inv-card .sell-btn { background: #fff; border: 1px solid var(--accent-blue); color: var(--accent-blue); width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;}
 .inv-card .sell-btn:hover { background: var(--accent-blue); color: #fff; }
 
-.win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 300; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
-.win-content { text-align: center; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 300; flex-direction: column; backdrop-filter: blur(5px); }
+.win-content { flex: 1; overflow-y: auto; text-align: center; padding: 20px 20px 120px 20px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; align-items: center; }
+.win-items-scroll { width: 100%; max-width: 900px; display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
+.win-bottom-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff; padding: 15px 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); display: flex; gap: 15px; justify-content: center; align-items: center; z-index: 310; border-top: 1px solid var(--border-color); flex-wrap: wrap; }
+.win-action-btn { flex: 1; max-width: 300px; padding: 15px 25px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; border: none; min-width: 180px; }
+.claim-btn { background: var(--accent-blue); color: #fff; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4); }
+.claim-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+.sell-all-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4); }
+.sell-all-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(245, 158, 11, 0.5); }
+@media (max-width: 500px) {
+    .win-bottom-panel { flex-direction: column; padding: 10px; }
+    .win-action-btn { width: 100%; max-width: 100%; }
+    .win-content { padding-bottom: 180px; }
+}
+
 .win-title { font-size: 38px; color: var(--accent-blue); margin-bottom: 20px; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; }
 .win-items { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; max-width: 600px; }
 .win-item-card { background: #ffffff; border: 2px solid var(--accent-blue); border-radius: 16px; padding: 20px; width: 160px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); position: relative; }
 .win-item-card img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; }
 .win-item-name { font-size: 14px; font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
 .win-item-price { color: var(--gold); font-weight: 900; font-size: 18px; }
-.close-win-btn { background: var(--accent-blue); border: none; color: #fff; padding: 15px 50px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4); }
-.close-win-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
 
 @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 .confetti { position: absolute; width: 12px; height: 12px; animation: fall linear forwards; z-index: 299; border-radius: 50%; }
@@ -276,6 +296,14 @@
             .up-wheel-container { width: 220px; height: 220px; }
             .up-wheel-inner img { width: 60px; height: 60px; }
         }
+
+        /* --- АНИМАЦИЯ КРУЧЕНИЯ АПГРЕЙДЕРА --- */
+        @keyframes spinPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .up-wheel-container.spinning { animation: spinPulse 0.3s ease-in-out infinite; }
+        .up-wheel-container.spinning .up-wheel-bg { filter: blur(1px) brightness(1.3); }
+        .up-wheel-container.spinning .up-wheel-inner { animation: spinPulse 0.2s ease-in-out infinite; }
+        .up-wheel-container.spinning .up-chance-text { animation: pulseText 0.15s ease-in-out infinite alternate; }
+        @keyframes pulseText { from { transform: scale(1); } to { transform: scale(1.15); } }
     </style>
 </head>
 <body>
@@ -324,7 +352,8 @@
         function updateBalance() { document.getElementById('menu-balance-display').innerText = balance + ' ₽'; }
 
         function checkBonusStatus() {
-            const btn = document.getElementById('deposit-btn'); const now = Date.now(); const cooldown = 60 * 60 * 1000; 
+            const btn = document.getElementById('deposit-btn'); const now = Date.now(); 
+            const cooldown = 10 * 60 * 1000; // 10 МИНУТ
             if (now - lastBonusTime < cooldown) {
                 btn.disabled = true;
                 if (!bonusInterval) {
@@ -344,10 +373,10 @@
         }
 
         function claimBonus() {
-            const now = Date.now(); const cooldown = 60 * 60 * 1000;
+            const now = Date.now(); const cooldown = 10 * 60 * 1000; // 10 МИНУТ
             if (now - lastBonusTime >= cooldown) {
                 balance += 300; lastBonusTime = now; localStorage.setItem('lastBonusTime', lastBonusTime);
-                updateBalance(); checkBonusStatus(); alert("Вам начислено 300 ₽! Следующее пополнение через час.");
+                updateBalance(); checkBonusStatus(); alert("Вам начислено 300 ₽! Следующее пополнение через 10 минут.");
             }
         }
 
@@ -438,16 +467,45 @@
         }
 
         function showWinScreen() {
-            const winModal = document.getElementById('win-modal'); const container = document.getElementById('win-items-container'); container.innerHTML = '';
+            const winModal = document.getElementById('win-modal');
+            const container = document.getElementById('win-items-container');
+            container.innerHTML = '';
+
             wonItemsBuffer.forEach(item => {
-                const card = document.createElement('div'); card.className = 'win-item-card';
-                let borderColor = 'var(--border-color)'; if (item.rarity === 'Редкий') borderColor = 'var(--rarity-rare)'; if (item.rarity === 'Эпический') borderColor = 'var(--rarity-epic)';
+                const card = document.createElement('div');
+                card.className = 'win-item-card';
+                
+                let borderColor = 'var(--border-color)';
+                if (item.rarity === 'Редкий') borderColor = 'var(--rarity-rare)';
+                if (item.rarity === 'Эпический') borderColor = 'var(--rarity-epic)';
                 card.style.borderColor = borderColor;
-                card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div class="win-item-name">${item.name}</div><div class="win-item-price">${item.price} ₽</div>`;
-                container.appendChild(card); if (item.price > 0) inventory.push(item);
+
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}">
+                    <div class="win-item-name">${item.name}</div>
+                    <div class="win-item-price">${item.price} ₽</div>
+                `;
+                container.appendChild(card);
             });
-            winModal.style.display = 'flex'; createConfetti();
-            isSpinning = false; document.getElementById('fs-case-preview').style.display = 'flex'; document.getElementById('fs-controls').style.display = 'flex'; document.getElementById('fs-items-container').style.display = 'flex'; document.getElementById('roulette-wrapper').style.display = 'none';
+            
+            winModal.style.display = 'flex';
+            createConfetti();
+        }
+
+        function claimAllToInventory() {
+            if (wonItemsBuffer.length === 0) return;
+            wonItemsBuffer.forEach(item => { if (item.price > 0) inventory.push(item); });
+            closeWinModal();
+        }
+
+        function sellAllWonItems() {
+            if (wonItemsBuffer.length === 0) return;
+            let totalEarned = 0;
+            wonItemsBuffer.forEach(item => { if (item.price > 0) totalEarned += item.price; });
+            balance += totalEarned;
+            updateBalance();
+            alert(`Вы продали все предметы за ${totalEarned} ₽!`);
+            closeWinModal();
         }
 
         function createConfetti() {
@@ -463,7 +521,17 @@
             }
         }
 
-        function closeWinModal() { document.getElementById('win-modal').style.display = 'none'; setAmount(1, { target: document.querySelectorAll('.amount-btn')[0] }); }
+        function closeWinModal() {
+            document.getElementById('win-modal').style.display = 'none';
+            wonItemsBuffer = [];
+            isSpinning = false;
+            document.getElementById('fs-case-preview').style.display = 'flex';
+            document.getElementById('fs-controls').style.display = 'flex';
+            document.getElementById('fs-items-container').style.display = 'flex';
+            document.getElementById('roulette-wrapper').style.display = 'none';
+            if (document.querySelectorAll('.amount-btn')[0]) setAmount(1, { target: document.querySelectorAll('.amount-btn')[0] });
+        }
+
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function openUpgrader() { toggleMenu(); document.getElementById('upgrader-page').style.display = 'flex'; resetUpgrader(); }
@@ -538,9 +606,13 @@
             if (upInputItems.length > 0 && upTargetItem && upCurrentMultiplier > 0) {
                 const inputSum = upInputItems.reduce((sum, item) => sum + item.price, 0); const targetPrice = upTargetItem.price;
                 chance = (inputSum / (targetPrice * upCurrentMultiplier)) * 100;
-                if (chance > 99) chance = 99; if (chance < 1) chance = 1;
-                chanceText.innerText = chance.toFixed(1) + "%";
-                wheelBg.style.background = `conic-gradient(from 0deg, var(--accent-blue) 0%, var(--accent-blue) ${chance}%, #1e293b ${chance}%, #1e293b 100%)`;
+                if (chance > 99) chance = 99;
+                let displayChance;
+                if (chance < 0.01 && chance > 0) displayChance = chance.toFixed(5) + "%";
+                else if (chance < 1 && chance > 0) displayChance = chance.toFixed(3) + "%";
+                else displayChance = chance.toFixed(1) + "%";
+                chanceText.innerText = displayChance;
+                wheelBg.style.background = `conic-gradient(from 0deg, var(--accent-b                wheelBg.style.background = `conic-gradient(from 0deg, var(--accent-blue) 0%, var(--accent-blue) ${Math.max(chance, 0.5)}%, #1e293b ${Math.max(chance, 0.5)}%, #1e293b 100%)`;
             } else {
                 chanceText.innerText = "0%";
                 wheelBg.style.background = `conic-gradient(from 0deg, #3b82f6 0%, #3b82f6 0%, #1e293b 0%, #1e293b 100%)`;
@@ -551,51 +623,94 @@
             if (!upTargetItem) { alert("Выберите желаемый предмет справа!"); return; }
             if (upInputItems.length === 0) { alert("Добавьте предметы для апгрейда слева!"); return; }
             if (upCurrentMultiplier === 0) { alert("Выберите множитель (x2, x3 и т.д.)!"); return; }
-            const inputSum = upInputItems.reduce((sum, item) => sum + item.price, 0); const targetPrice = upTargetItem.price; const requiredValue = targetPrice * upCurrentMultiplier;
-            if (inputSum < requiredValue) { alert("Сумма ваших предметов слишком мала для такого множителя! Выберите другой множитель или предметы."); return; }
-            let chance = (inputSum / requiredValue) * 100; if (chance > 99) chance = 99;
-            const btn = document.querySelector('.up-action-btn'); btn.disabled = true; btn.innerText = "КРУТИМ...";
+            
+            const inputSum = upInputItems.reduce((sum, item) => sum + item.price, 0); 
+            const targetPrice = upTargetItem.price; 
+            const requiredValue = targetPrice * upCurrentMultiplier;
+            
+            let chance = (inputSum / requiredValue) * 100;
+            if (chance > 99) chance = 99;
+            if (chance < 0) chance = 0;
+            
+            const btn = document.querySelector('.up-action-btn'); 
+            btn.disabled = true; 
+            btn.innerText = "КРУТИМ...";
+            
+            const wheelBg = document.getElementById('up-wheel-bg');
+            const chanceText = document.getElementById('up-chance-text');
+            const wheelContainer = document.querySelector('.up-wheel-container');
+            
+            wheelContainer.classList.add('spinning');
+            
             let ticks = 0;
-                        const tickInterval = setInterval(() => {
+            const totalTicks = 30;
+            
+            const tickInterval = setInterval(() => {
                 const randomChance = Math.random() * 100;
-                document.getElementById('up-chance-text').innerText = randomChance.toFixed(1) + "%";
-                document.getElementById('up-wheel-bg').style.background = `conic-gradient(from 0deg, var(--accent-blue) 0%, var(--accent-blue) ${randomChance}%, #1e293b ${randomChance}%, #1e293b 100%)`;
+                const colors = ['#3b82f6', '#60a5fa', '#a855f7', '#f59e0b'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                chanceText.innerText = randomChance.toFixed(1) + "%";
+                chanceText.style.color = randomColor;
+                wheelBg.style.background = `conic-gradient(from ${ticks * 30}deg, ${randomColor} 0%, ${randomColor} ${randomChance}%, #1e293b ${randomChance}%, #1e293b 100%)`;
+                
                 ticks++;
-                if (ticks > 20) {
-                    clearInterval(tickInterval);
-                    finishUpgrade(chance);
-                }
+                if (ticks > totalTicks) { clearInterval(tickInterval); finishUpgrade(chance); }
             }, 100);
         }
 
         function finishUpgrade(winChance) {
             const roll = Math.random() * 100;
             const isWin = roll <= winChance;
-
-            const btn = document.querySelector('.up-action-btn');
-            btn.disabled = false;
+            
+            const btn = document.querySelector('.up-action-btn'); 
+            btn.disabled = false; 
             btn.innerText = "Прокачать";
-
+            
+            const wheelContainer = document.querySelector('.up-wheel-container');
+            const chanceText = document.getElementById('up-chance-text');
+            wheelContainer.classList.remove('spinning');
+            chanceText.style.color = 'var(--accent-blue)';
+            
             updateWheelVisuals();
-
+            
+            const wheelInner = document.querySelector('.up-wheel-inner');
+            wheelInner.style.transition = 'transform 0.3s, box-shadow 0.3s';
+            
             if (isWin) {
-                inventory.push(upTargetItem);
-                wonItemsBuffer = [upTargetItem];
-                showWinScreen();
-
-                upInputItems = [];
-                upTargetItem = null;
-                upCurrentMultiplier = 0;
-                document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
-                renderUpSlots();
+                wheelInner.style.boxShadow = '0 0 60px #10b981, 0 0 100px #10b981';
+                wheelInner.style.transform = 'scale(1.15)';
+                
+                setTimeout(() => {
+                    wheelInner.style.boxShadow = '';
+                    wheelInner.style.transform = 'scale(1)';
+                    
+                    inventory.push(upTargetItem);
+                    wonItemsBuffer = [upTargetItem];
+                    showWinScreen();
+                    
+                    upInputItems = [];
+                    upTargetItem = null;
+                    upCurrentMultiplier = 0;
+                    document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
+                    renderUpSlots();
+                }, 600);
             } else {
-                alert("Апгрейд не удался! Ваши предметы сгорели.");
-
-                upInputItems = [];
-                upTargetItem = null;
-                upCurrentMultiplier = 0;
-                document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
-                renderUpSlots();
+                wheelInner.style.boxShadow = '0 0 60px #ef4444, 0 0 100px #ef4444';
+                wheelInner.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    wheelInner.style.boxShadow = '';
+                    wheelInner.style.transform = 'scale(1)';
+                    
+                    alert("Апгрейд не удался! Ваши предметы сгорели.");
+                    
+                    upInputItems = [];
+                    upTargetItem = null;
+                    upCurrentMultiplier = 0;
+                    document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
+                    renderUpSlots();
+                }, 600);
             }
         }
     </script>
