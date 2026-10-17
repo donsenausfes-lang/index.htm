@@ -222,18 +222,26 @@
         </div>
     </div>
         <script>
-        // --- ВОТ ТУТ ИСПРАВЛЕННЫЕ КАРТИНКИ ---
         const casesData = [
             { id: 1, name: "Начальный", price: 49, img: "https://i.ibb.co/y740rhw/In-Shot-20261017-155827018.jpg" },
             { id: 2, name: "Барахло", price: 129, img: "https://i.ibb.co/MkQfzWB4/In-Shot-20261017-162333547.jpg" },
             { id: 3, name: "Мелочь", price: 249, img: "https://i.ibb.co/nNyPRypn/In-Shot-20261017-162647410.jpg" },
-            { id: 4, name: "Стандарт", price: 499, img: "https://i.ibb.co/cc9k6Md0/In-Shot-20261017-162952965.jpg" }, // Твоя ссылка
-            { id: 5, name: "Черный", price: 999, img: "https://i.ibb.co/V0CGvcnV/In-Shot-20261017-163812675.jpg" }, // Кейс с UFC
-            { id: 6, name: "Ценный", price: 2299, img: "https://i.ibb.co/RTmX1wFT/In-Shot-20261017-163301294.jpg" } // Взял 6-й из твоей первой партии
+            { id: 4, name: "Стандарт", price: 499, img: "https://i.ibb.co/cc9k6Md0/In-Shot-20261017-162952965.jpg" }, 
+            { id: 5, name: "Черный", price: 999, img: "https://i.ibb.co/V0CGvcnV/In-Shot-20261017-163812675.jpg" }, 
+            { id: 6, name: "Ценный", price: 2299, img: "https://i.ibb.co/RTmX1wFT/In-Shot-20261017-163301294.jpg" } 
         ];
 
+        // --- ОБНОВЛЕННЫЙ СПИСОК ПРЕДМЕТОВ С ШАНСАМИ И РЕДКОСТЯМИ ---
         const caseItems = {
-            1: [{ name: "Spring Grove", img: "https://i.ibb.co/60TBqPxv/Spring-Grove.webp", price: 19 }]
+            1: [
+                { name: "Spring Grove", img: "https://i.ibb.co/60TBqPxv/Spring-Grove.webp", price: 99, chance: 10, rarity: "Обычный" },
+                { name: "Bear Terrorist", img: "https://i.ibb.co/938szMQM/Bear-Terrorist.webp", price: 15, chance: 40, rarity: "Обычный" },
+                { name: "Clown Bear", img: "https://i.ibb.co/kVww1zTc/Clown-Bear.webp", price: 25, chance: 20, rarity: "Обычный" },
+                { name: "Easter Bear", img: "https://i.ibb.co/ZpHYmw7g/Easter-Bear.webp", price: 50, chance: 15, rarity: "Обычный" },
+                { name: "Balinese", img: "https://i.ibb.co/R4Yhf88S/Balinese.webp", price: 150, chance: 7, rarity: "Редкий" },
+                { name: "Bull Run", img: "https://i.ibb.co/Kj6TRqd1/Bull-Run.webp", price: 300, chance: 4, rarity: "Эпический" },
+                { name: "Bear Market", img: "https://i.ibb.co/h1sx91P4/Bear-Market.webp", price: 350, chance: 4, rarity: "Эпический" }
+            ]
         };
 
         let balance = 0;
@@ -364,6 +372,20 @@
             document.getElementById('fs-open-btn').innerText = `Открыть за ${c.price * spinAmount} ₽`;
         }
 
+        // --- ФУНКЦИЯ ВЫПАДЕНИЯ ПО ШАНСАМ ---
+        function getRandomItem(itemsPool) {
+            let rand = Math.random() * 100;
+            let cumulative = 0;
+
+            for (let item of itemsPool) {
+                cumulative += (item.chance || 0);
+                if (rand <= cumulative) {
+                    return item;
+                }
+            }
+            return itemsPool[itemsPool.length - 1];
+        }
+
         function startSpin() {
             if (isSpinning) return;
             const c = casesData.find(x => x.id === currentCaseId);
@@ -392,12 +414,14 @@
             strip.style.transition = 'none';
             strip.style.transform = 'translateX(0)';
 
-            let itemsPool = caseItems[currentCaseId];
-            if (!itemsPool || itemsPool.length === 0) {
-                itemsPool = [{ name: "Пусто", img: "https://via.placeholder.com/100/f8fafc/94a3b8?text=Empty", price: 0 }];
+            let itemsPool = JSON.parse(JSON.stringify(caseItems[currentCaseId] || [])); 
+
+            if (itemsPool.length === 0) {
+                itemsPool = [{ name: "Пусто", img: "https://via.placeholder.com/100/f8fafc/94a3b8?text=Empty", price: 0, chance: 100 }];
             }
 
-            const totalItems = 60 + spinAmount;
+            // Генерируем ленту (60 элементов для красоты)
+            const totalItems = 60;
             for (let i = 0; i < totalItems; i++) {
                 const randomItem = itemsPool[Math.floor(Math.random() * itemsPool.length)];
                 const div = document.createElement('div');
@@ -408,7 +432,7 @@
 
             const winIndex = 50; 
             for (let i = 0; i < spinAmount; i++) {
-                const wonItem = itemsPool[Math.floor(Math.random() * itemsPool.length)];
+                const wonItem = getRandomItem(itemsPool); 
                 wonItemsBuffer.push(wonItem);
                 if(i === 0) {
                     strip.children[winIndex].innerHTML = `<img src="${wonItem.img}" alt="item">`;
@@ -438,6 +462,14 @@
             wonItemsBuffer.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'win-item-card';
+                
+                // Красим рамку в зависимости от редкости
+                let borderColor = 'var(--border-color)';
+                if (item.rarity === 'Редкий') borderColor = '#3b82f6';
+                if (item.rarity === 'Эпический') borderColor = '#a855f7';
+
+                card.style.borderColor = borderColor;
+
                 card.innerHTML = `
                     <img src="${item.img}" alt="${item.name}">
                     <div class="win-item-name">${item.name}</div>
