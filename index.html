@@ -4,164 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CA$E BATTLE</title>
-    <style>
-        :root {
-            --bg-main: #f4f7fc;
-            --bg-card: #ffffff;
-            --accent-blue: #3b82f6;
-            --accent-hover: #2563eb;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --gold: #f59e0b;
-            
-            /* Цвета редкостей */
-            --rarity-common: #94a3b8;
-            --rarity-rare: #3b82f6;
-            --rarity-epic: #a855f7;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; }
-        
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394a3b8' fill-opacity='0.15'%3E%3Cpath d='M30 20h-5v5h-5v5h5v5h5v-5h5v-5h-5v-5zm0-10l10-5 10 5v10l-10 5-10-5V10zm10 15l10-5 10 5v10l-10 5-10-5V25zm-20 0l10-5 10 5v10l-10 5-10-5V25z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        header {
-            width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background-color: #ffffff; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .logo { font-size: 24px; font-weight: 900; color: var(--accent-blue); letter-spacing: 1px; font-style: italic; }
-        
-        .burger-menu { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; border-radius: 8px; background: var(--bg-main); transition: 0.2s; }
-        .burger-menu:hover { background: #e2e8f0; }
-        .burger-menu span { display: block; width: 25px; height: 3px; background-color: var(--accent-blue); border-radius: 2px; }
-
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 140; backdrop-filter: blur(2px); }
-        .overlay.open { display: block; }
-
-        .side-menu {
-            position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #ffffff;
-            z-index: 150; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid var(--border-color);
-            padding: 25px; display: flex; flex-direction: column; gap: 20px; box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-        }
-        .side-menu.open { right: 0; }
-        
-        .menu-header { display: flex; justify-content: space-between; align-items: center; }
-        .close-menu { font-size: 28px; color: var(--text-muted); cursor: pointer; background: none; border: none; transition: 0.2s; line-height: 1; }
-        .close-menu:hover { color: var(--text-main); }
-
-        .menu-balance-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #bfdbfe; }
-        .menu-balance-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-        .menu-balance-val { font-size: 32px; font-weight: 900; color: var(--accent-blue); }
-        
-        .menu-btn {
-            background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 15px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;
-            font-size: 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        .menu-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1); }
-        .menu-btn:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg-main); color: var(--text-muted); }
-        .menu-btn:disabled:hover { border-color: var(--border-color); color: var(--text-muted); box-shadow: none; }
-
-        .page-content { padding: 30px 20px; max-width: 1000px; margin: 0 auto; }
-        .page-title { text-align: center; font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; color: var(--text-main); }
-        
-        .cases-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        @media (min-width: 768px) { .cases-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; } }
-
-        .case-card {
-            display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s;
-            background: var(--bg-card); border-radius: 16px; padding: 20px 10px; border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .case-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15); }
-        
-        .case-card img { width: 100%; max-width: 150px; height: 150px; object-fit: contain; margin-bottom: 15px; }
-        
-        .case-card h3 { font-size: 15px; margin-bottom: 10px; text-transform: uppercase; font-weight: 800; color: var(--text-main); }
-        .case-card .price { color: var(--accent-blue); font-weight: bold; font-size: 15px; background: #eff6ff; padding: 6px 20px; border-radius: 20px; border: 1px solid #bfdbfe; }
-
-        /* --- ПОЛНОЭКРАННЫЙ ЭКРАН КЕЙСА --- */
-        .fullscreen-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main);
-            z-index: 100; display: none; flex-direction: column; align-items: center; overflow-y: auto; padding-bottom: 50px;
-        }
-        .close-fs { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--text-muted); cursor: pointer; z-index: 10; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .close-fs:hover { color: var(--text-main); }
-
-        .fs-case-container { display: flex; flex-direction: column; align-items: center; margin-top: 70px; margin-bottom: 20px; }
-        .fs-case-img { width: 200px; height: 200px; object-fit: contain; }
-        .fs-case-title { font-size: 26px; margin-top: 15px; text-transform: uppercase; font-weight: 900; }
-
-        .controls-area { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
-        .amount-selector { display: flex; gap: 8px; background: #ffffff; padding: 6px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-        .amount-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; font-weight: bold; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .amount-btn:hover { background: var(--bg-main); color: var(--text-main); }
-        .amount-btn.active { background: var(--accent-blue); color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
-        
-        .open-btn { background: var(--accent-blue); border: none; color: #fff; padding: 16px 50px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
-        .open-btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); }
-
-        /* --- СОДЕРЖИМОЕ КЕЙСА (Сетка предметов) --- */
-        .case-items-container { width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; }
-        .case-items-title { font-size: 18px; font-weight: 800; margin-bottom: 15px; color: var(--text-muted); text-transform: uppercase; }
-        .case-items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; width: 100%; }
-        .ci-card {
-            background: #fff; border-radius: 12px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center;
-            border: 2px solid var(--border-color); position: relative; transition: 0.2s;
-        }
-        .ci-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        
-        .ci-card.common { border-color: var(--rarity-common); }
-        .ci-card.rare { border-color: var(--rarity-rare); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
-        .ci-card.epic { border-color: var(--rarity-epic); box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
-
-        .ci-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
-        .ci-card .ci-name { font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        .ci-card .ci-price { font-size: 14px; font-weight: 900; color: var(--gold); margin-bottom: 5px; }
-        .ci-card .ci-chance { font-size: 11px; font-weight: bold; color: var(--text-muted); background: var(--bg-main); padding: 2px 8px; border-radius: 10px; }
-
-        /* --- РУЛЕТКА --- */
-        .roulette-wrapper { width: 100%; max-width: 900px; height: 140px; background: #ffffff; border: 2px solid var(--accent-blue); position: relative; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15); border-radius: 16px; display: none; }
-        .roulette-strip { display: flex; height: 100%; position: absolute; left: 0; }
-        .roulette-item { width: 130px; height: 100%; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--border-color); background: #f8fafc; padding: 10px; }
-        .roulette-item img { max-width: 90%; max-height: 90%; object-fit: contain; }
-        .roulette-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: var(--accent-blue); z-index: 10; box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); }
-
-        /* --- МОДАЛКИ --- */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-        .modal-content { background: #ffffff; border-radius: 20px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative; }
-        .modal-content h2 { margin-bottom: 20px; font-size: 22px; font-weight: 800; }
-        
-        .inv-modal .modal-content { max-width: 600px; }
-        .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
-        .inv-card { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .inv-card img { width: 100%; height: 70px; object-fit: contain; margin-bottom: 10px; }
-        .inv-card .sell-btn { background: #fff; border: 1px solid var(--accent-blue); color: var(--accent-blue); width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;}
-        .inv-card .sell-btn:hover { background: var(--accent-blue); color: #fff; }
-
-        .win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 300; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
-        .win-content { text-align: center; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .win-title { font-size: 38px; color: var(--accent-blue); margin-bottom: 20px; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; }
-        .win-items { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; max-width: 600px; }
-        .win-item-card { background: #ffffff; border: 2px solid var(--accent-blue); border-radius: 16px; padding: 20px; width: 160px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); position: relative; }
-        .win-item-card img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; }
-        .win-item-name { font-size: 14px; font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
-        .win-item-price { color: var(--gold); font-weight: 900; font-size: 18px; }
-        
-        .close-win-btn { background: var(--accent-blue); border: none; color: #fff; padding: 15px 50px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4); }
-        .close-win-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
-
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .confetti { position: absolute; width: 12px; height: 12px; animation: fall linear forwards; z-index: 299; border-radius: 50%; }
-        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-    </style>
 </head>
 <body>
 
@@ -187,8 +29,8 @@
             <div class="menu-balance-val" id="menu-balance-display">0 ₽</div>
         </div>
         
-        <!-- ТУТ ТЕПЕРЬ ОДНА КНОПКА, КОТОРАЯ ДАЕТ 300 РАЗ В ЧАС -->
         <button class="menu-btn" id="deposit-btn" onclick="claimBonus()">💳 <span>Пополнить +300₽</span></button>
+        <button class="menu-btn" onclick="openUpgrader()">🔄 <span>Апгрейдер</span></button>
         <button class="menu-btn" onclick="openInventory()">🎒 <span>Мой Инвентарь</span></button>
     </div>
 
@@ -196,54 +38,247 @@
         <h1 class="page-title">Серийные кейсы</h1>
         <div class="cases-grid" id="cases-grid"></div>
     </div>
-
     <!-- Экран кейса -->
-    <div class="fullscreen-page" id="fs-page">
-        <div class="close-fs" onclick="closeFsPage()">×</div>
+<div class="fullscreen-page" id="fs-page">
+    <div class="close-fs" onclick="closeFsPage()">×</div>
+    
+    <div class="fs-case-container" id="fs-case-preview">
+        <img id="fs-case-img" class="fs-case-img" src="" alt="Case">
+        <h2 id="fs-case-title" class="fs-case-title">Название</h2>
+    </div>
+
+    <div class="controls-area" id="fs-controls">
+        <div class="amount-selector">
+            <button class="amount-btn active" onclick="setAmount(1, event)">1</button>
+            <button class="amount-btn" onclick="setAmount(2, event)">2</button>
+            <button class="amount-btn" onclick="setAmount(3, event)">3</button>
+            <button class="amount-btn" onclick="setAmount(5, event)">5</button>
+            <button class="amount-btn" onclick="setAmount(10, event)">10</button>
+        </div>
+        <button class="open-btn" id="fs-open-btn" onclick="startSpin()">Открыть</button>
+    </div>
+
+    <div class="roulette-wrapper" id="roulette-wrapper">
+        <div class="roulette-pointer"></div>
+        <div class="roulette-strip" id="roulette-strip"></div>
+    </div>
+
+    <div class="case-items-container" id="fs-items-container">
+        <div class="case-items-title">Что может выпасть</div>
+        <div class="case-items-grid" id="fs-items-grid"></div>
+    </div>
+</div>
+
+<!-- ЭКРАН АПГРЕЙДЕРА -->
+<div class="upgrader-page" id="upgrader-page">
+    <div class="close-fs" onclick="closeUpgrader()">×</div>
+    
+    <h1 class="up-title">МОДЕРНИЗАЦИЯ ПОДАРКОВ</h1>
+
+    <div class="up-wheel-container">
+        <div class="up-wheel-bg" id="up-wheel-bg"></div>
+        <div class="up-wheel-inner">
+            <img id="up-wheel-img" src="https://via.placeholder.com/100/1e293b/64748b?text=?" alt="Target">
+            <div class="up-chance-text" id="up-chance-text">0%</div>
+        </div>
+        <div class="up-marker m100">100%</div>
+        <div class="up-marker m50r">50%</div>
+        <div class="up-marker m0">0%</div>
+        <div class="up-marker m50l">50%</div>
+    </div>
+
+    <div class="up-multipliers">
+        <button class="up-mult-btn" onclick="setUpMultiplier(2, event)">x2</button>
+        <button class="up-mult-btn" onclick="setUpMultiplier(3, event)">x3</button>
+        <button class="up-mult-btn" onclick="setUpMultiplier(5, event)">x5</button>
+        <button class="up-mult-btn" onclick="setUpMultiplier(10, event)">x10</button>
+    </div>
+
+    <div class="up-items-area">
+        <div class="up-column">
+            <div class="up-column-title">Выберите до 6-ти предметов<br>на апгрейд</div>
+            <div class="up-slot" id="up-slot-input" onclick="openItemSelection('input')">+</div>
+        </div>
+        <div class="up-column">
+            <div class="up-column-title">Выберите подарок,<br>который хотите получить</div>
+            <div class="up-slot" id="up-slot-target" onclick="openItemSelection('target')">+</div>
+        </div>
+    </div>
+
+    <button class="up-action-btn" onclick="startUpgrade()">Прокачать</button>
+</div>
+
+<!-- Модалка выбора для апгрейдера -->
+<div class="modal up-selection-modal" id="up-selection-modal">
+    <div class="modal-content">
+        <button class="close-menu" style="position:absolute; top:15px; right:15px;" onclick="closeModal('up-selection-modal')">×</button>
+        <h2 id="up-selection-title">Выберите предмет</h2>
+        <div class="inv-grid" id="up-selection-grid"></div>
+    </div>
+</div>
+
+<!-- Инвентарь -->
+<div class="modal inv-modal" id="inventory-modal">
+    <div class="modal-content">
+        <h2>🎒 Инвентарь</h2>
+        <div class="inv-grid" id="inventory-grid"></div>
+        <p id="empty-inv-msg" style="color:var(--text-muted); margin-top:20px; font-weight:bold;">Тут пока пусто...</p>
+        <button style="background:none; border:none; color:var(--text-muted); margin-top:20px; cursor:pointer; font-weight:bold;" onclick="closeModal('inventory-modal')">Закрыть</button>
+    </div>
+</div>
+
+<!-- Экран выигрыша -->
+<div class="win-modal" id="win-modal">
+    <div class="win-content">
+        <div class="win-title">выпало:</div>
+        <div class="win-items" id="win-items-container"></div>
+        <button class="close-win-btn" onclick="closeWinModal()">Забрать</button>
+    </div>
+</div>
+<style>
+    :root {
+        --bg-main: #f4f7fc; --bg-card: #ffffff; --accent-blue: #3b82f6; --accent-hover: #2563eb;
+        --text-main: #1e293b; --text-muted: #64748b; --border-color: #e2e8f0; --gold: #f59e0b;
+        --rarity-common: #94a3b8; --rarity-rare: #3b82f6; --rarity-epic: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; }
+    body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; overflow-x: hidden;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2394a3b8' fill-opacity='0.15'%3E%3Cpath d='M30 20h-5v5h-5v5h5v5h5v-5h5v-5h-5v-5zm0-10l10-5 10 5v10l-10 5-10-5V10zm10 15l10-5 10 5v10l-10 5-10-5V25zm-20 0l10-5 10 5v10l-10 5-10-5V25z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+    
+    header { width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .logo { font-size: 24px; font-weight: 900; color: var(--accent-blue); letter-spacing: 1px; font-style: italic; }
+    .burger-menu { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 10px; border-radius: 8px; background: var(--bg-main); transition: 0.2s; }
+    .burger-menu:hover { background: #e2e8f0; }
+    .burger-menu span { display: block; width: 25px; height: 3px; background-color: var(--accent-blue); border-radius: 2px; }
+
+    .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 140; backdrop-filter: blur(2px); }
+    .overlay.open { display: block; }
+    .side-menu { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: #ffffff; z-index: 150; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid var(--border-color); padding: 25px; display: flex; flex-direction: column; gap: 20px; box-shadow: -10px 0 30px rgba(0,0,0,0.1); }
+    .side-menu.open { right: 0; }
+    .menu-header { display: flex; justify-content: space-between; align-items: center; }
+    .close-menu { font-size: 28px; color: var(--text-muted); cursor: pointer; background: none; border: none; transition: 0.2s; line-height: 1; }
+    .close-menu:hover { color: var(--text-main); }
+    .menu-balance-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #bfdbfe; }
+    .menu-balance-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+    .menu-balance-val { font-size: 32px; font-weight: 900; color: var(--accent-blue); }
+    .menu-btn { background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 15px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    .menu-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.1); }
+    .menu-btn:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg-main); color: var(--text-muted); }
+    .menu-btn:disabled:hover { border-color: var(--border-color); color: var(--text-muted); box-shadow: none; }
+
+    .page-content { padding: 30px 20px; max-width: 1000px; margin: 0 auto; }
+    .page-title { text-align: center; font-size: 24px; font-weight: 900; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; color: var(--text-main); }
+    .cases-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    @media (min-width: 768px) { .cases-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; } }
+    .case-card { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.3s; background: var(--bg-card); border-radius: 16px; padding: 20px 10px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .case-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15); }
+    .case-card img { width: 100%; max-width: 150px; height: 150px; object-fit: contain; margin-bottom: 15px; }
+    .case-card h3 { font-size: 15px; margin-bottom: 10px; text-transform: uppercase; font-weight: 800; color: var(--text-main); }
+    .case-card .price { color: var(--accent-blue); font-weight: bold; font-size: 15px; background: #eff6ff; padding: 6px 20px; border-radius: 20px; border: 1px solid #bfdbfe; }
+    .fullscreen-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main); z-index: 100; display: none; flex-direction: column; align-items: center; overflow-y: auto; padding-bottom: 50px; }
+.close-fs { position: absolute; top: 20px; left: 20px; font-size: 24px; color: var(--text-muted); cursor: pointer; z-index: 10; background: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.close-fs:hover { color: var(--text-main); }
+.fs-case-container { display: flex; flex-direction: column; align-items: center; margin-top: 70px; margin-bottom: 20px; }
+.fs-case-img { width: 200px; height: 200px; object-fit: contain; }
+.fs-case-title { font-size: 26px; margin-top: 15px; text-transform: uppercase; font-weight: 900; }
+.controls-area { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
+.amount-selector { display: flex; gap: 8px; background: #ffffff; padding: 6px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+.amount-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; font-weight: bold; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.amount-btn:hover { background: var(--bg-main); color: var(--text-main); }
+.amount-btn.active { background: var(--accent-blue); color: #fff; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+.open-btn { background: var(--accent-blue); border: none; color: #fff; padding: 16px 50px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+.open-btn:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); }
+
+.case-items-container { width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; }
+.case-items-title { font-size: 18px; font-weight: 800; margin-bottom: 15px; color: var(--text-muted); text-transform: uppercase; }
+.case-items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; width: 100%; }
+.ci-card { background: #fff; border-radius: 12px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; border: 2px solid var(--border-color); position: relative; transition: 0.2s; }
+.ci-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.ci-card.common { border-color: var(--rarity-common); }
+.ci-card.rare { border-color: var(--rarity-rare); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+.ci-card.epic { border-color: var(--rarity-epic); box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+.ci-card img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+.ci-card .ci-name { font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+.ci-card .ci-price { font-size: 14px; font-weight: 900; color: var(--gold); margin-bottom: 5px; }
+.ci-card .ci-chance { font-size: 11px; font-weight: bold; color: var(--text-muted); background: var(--bg-main); padding: 2px 8px; border-radius: 10px; }
+
+.roulette-wrapper { width: 100%; max-width: 900px; height: 140px; background: #ffffff; border: 2px solid var(--accent-blue); position: relative; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15); border-radius: 16px; display: none; }
+.roulette-strip { display: flex; height: 100%; position: absolute; left: 0; }
+.roulette-item { width: 130px; height: 100%; flex-shrink: 0; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--border-color); background: #f8fafc; padding: 10px; }
+.roulette-item img { max-width: 90%; max-height: 90%; object-fit: contain; }
+.roulette-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: var(--accent-blue); z-index: 10; box-shadow: 0 0 15px rgba(59, 130, 246, 0.8); }
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+.modal-content { background: #ffffff; border-radius: 20px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); position: relative; }
+.modal-content h2 { margin-bottom: 20px; font-size: 22px; font-weight: 800; }
+.inv-modal .modal-content { max-width: 600px; }
+.inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-top: 20px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+.inv-card { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+.inv-card img { width: 100%; height: 70px; object-fit: contain; margin-bottom: 10px; }
+.inv-card .sell-btn { background: #fff; border: 1px solid var(--accent-blue); color: var(--accent-blue); width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 13px;}
+.inv-card .sell-btn:hover { background: var(--accent-blue); color: #fff; }
+
+.win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 300; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
+.win-content { text-align: center; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.win-title { font-size: 38px; color: var(--accent-blue); margin-bottom: 20px; text-transform: uppercase; font-weight: 900; letter-spacing: 2px; }
+.win-items { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; max-width: 600px; }
+.win-item-card { background: #ffffff; border: 2px solid var(--accent-blue); border-radius: 16px; padding: 20px; width: 160px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); position: relative; }
+.win-item-card img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; }
+.win-item-name { font-size: 14px; font-weight: 800; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main);}
+.win-item-price { color: var(--gold); font-weight: 900; font-size: 18px; }
+.close-win-btn { background: var(--accent-blue); border: none; color: #fff; padding: 15px 50px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: 0.3s; text-transform: uppercase; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4); }
+.close-win-btn:hover { background: var(--accent-hover); transform: scale(1.05); }
+
+@keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.confetti { position: absolute; width: 12px; height: 12px; animation: fall linear forwards; z-index: 299; border-radius: 50%; }
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+            /* --- СТИЛИ ДЛЯ АПГРЕЙДЕРА --- */
+        .upgrader-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 110; display: none; flex-direction: column; align-items: center; overflow-y: auto; padding: 20px; color: #fff; background-image: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); }
+        .upgrader-page .close-fs { background: #1e293b; color: #fff; border: 1px solid #334155; }
+        .upgrader-page .close-fs:hover { background: #334155; color: #fff; }
+        .up-title { font-size: 24px; font-weight: 900; margin-top: 40px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(255,255,255,0.2); }
+        .up-wheel-container { position: relative; width: 280px; height: 280px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; }
+        .up-wheel-bg { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#3b82f6 0%, #3b82f6 50%, #1e293b 50%, #1e293b 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 30px rgba(59,130,246,0.2); transition: background 0.5s; }
+        .up-wheel-inner { position: absolute; width: 82%; height: 82%; border-radius: 50%; background: #0f172a; display: flex; justify-content: center; align-items: center; flex-direction: column; border: 2px solid #334155; z-index: 2; }
+        .up-wheel-inner img { width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(59,130,246,0.5)); }
+        .up-chance-text { position: absolute; bottom: -25px; font-size: 20px; font-weight: 900; color: var(--accent-blue); text-shadow: 0 0 10px rgba(59,130,246,0.5); }
         
-        <div class="fs-case-container" id="fs-case-preview">
-            <img id="fs-case-img" class="fs-case-img" src="" alt="Case">
-            <h2 id="fs-case-title" class="fs-case-title">Название</h2>
-        </div>
-
-        <div class="controls-area" id="fs-controls">
-            <div class="amount-selector">
-                <button class="amount-btn active" onclick="setAmount(1, event)">1</button>
-                <button class="amount-btn" onclick="setAmount(2, event)">2</button>
-                <button class="amount-btn" onclick="setAmount(3, event)">3</button>
-                <button class="amount-btn" onclick="setAmount(5, event)">5</button>
-                <button class="amount-btn" onclick="setAmount(10, event)">10</button>
-            </div>
-            <button class="open-btn" id="fs-open-btn" onclick="startSpin()">Открыть</button>
-        </div>
-
-        <div class="roulette-wrapper" id="roulette-wrapper">
-            <div class="roulette-pointer"></div>
-            <div class="roulette-strip" id="roulette-strip"></div>
-        </div>
-
-        <div class="case-items-container" id="fs-items-container">
-            <div class="case-items-title">Что может выпасть</div>
-            <div class="case-items-grid" id="fs-items-grid"></div>
-        </div>
-    </div>
-
-    <div class="modal inv-modal" id="inventory-modal">
-        <div class="modal-content">
-            <h2>🎒 Инвентарь</h2>
-            <div class="inv-grid" id="inventory-grid"></div>
-            <p id="empty-inv-msg" style="color:var(--text-muted); margin-top:20px; font-weight:bold;">Тут пока пусто...</p>
-            <button style="background:none; border:none; color:var(--text-muted); margin-top:20px; cursor:pointer; font-weight:bold;" onclick="closeModal('inventory-modal')">Закрыть</button>
-        </div>
-    </div>
-
-    <div class="win-modal" id="win-modal">
-        <div class="win-content">
-            <div class="win-title">выпало:</div>
-            <div class="win-items" id="win-items-container"></div>
-            <button class="close-win-btn" onclick="closeWinModal()">Забрать</button>
-        </div>
-    </div>
+        .up-marker { position: absolute; font-size: 12px; font-weight: bold; color: #64748b; }
+        .up-marker.m100 { top: -20px; left: 50%; transform: translateX(-50%); }
+        .up-marker.m50r { top: 50%; right: -25px; transform: translateY(-50%); }
+        .up-marker.m0 { bottom: -20px; left: 50%; transform: translateX(-50%); }
+        .up-marker.m50l { top: 50%; left: -25px; transform: translateY(-50%); }
+        
+        .up-multipliers { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+        .up-mult-btn { background: #1e293b; border: 1px solid #334155; color: #64748b; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .up-mult-btn:hover { border-color: #3b82f6; color: #fff; }
+        .up-mult-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+        
+        .up-items-area { display: flex; width: 100%; max-width: 800px; gap: 20px; margin-bottom: 30px; }
+        .up-column { flex: 1; background: #1e293b; border-radius: 12px; padding: 15px; border: 2px solid #334155; display: flex; flex-direction: column; align-items: center; min-height: 180px; }
+        .up-column-title { font-size: 14px; text-align: center; color: #94a3b8; font-weight: bold; margin-bottom: 15px; line-height: 1.2; }
+        .up-slot { width: 100%; height: 100px; border: 2px dashed #334155; border-radius: 10px; display: flex; justify-content: center; align-items: center; color: #64748b; font-size: 30px; cursor: pointer; transition: 0.2s; overflow: hidden; padding: 5px; }
+        .up-slot:hover { border-color: #3b82f6; color: #3b82f6; }
+        .up-slot img { width: 100%; height: 100%; object-fit: contain; }
+        .up-slot.filled { border-style: solid; border-color: #3b82f6; background: #0f172a; position: relative; }
+        .up-slot .clear-slot { position: absolute; top: 2px; right: 5px; font-size: 16px; color: #ef4444; cursor: pointer; font-weight: bold; z-index: 5; background: rgba(0,0,0,0.5); border-radius: 50%; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; }
+        
+        .up-action-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; color: #fff; padding: 16px 50px; font-size: 18px; font-weight: 900; border-radius: 12px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); margin-bottom: 50px; }
+        .up-action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6); }
+        .up-selection-modal .modal-content { background: #0f172a; border: 2px solid #334155; color: #fff; max-width: 600px; }
+        .up-selection-modal .close-menu { color: #fff; }
+        .up-selection-modal .inv-grid { max-height: 300px; }
+        .up-selection-modal .inv-card { background: #1e293b; border-color: #334155; color: #fff; }
+        .up-selection-modal .inv-card:hover { border-color: #3b82f6; transform: scale(0.98); }
+        
+        @media (max-width: 600px) {
+            .up-items-area { flex-direction: column; }
+            .up-wheel-container { width: 220px; height: 220px; }
+            .up-wheel-inner img { width: 60px; height: 60px; }
+        }
+    </style>
+</head>
+<body>
         <script>
         const casesData = [
             { id: 1, name: "Начальный", price: 49, img: "https://i.ibb.co/y740rhw/In-Shot-20261017-155827018.jpg" },
@@ -266,342 +301,302 @@
             ]
         };
 
-        let balance = 0;
-        let currentCaseId = null;
-        let spinAmount = 1;
-        let isSpinning = false;
-        let wonItemsBuffer = [];
-        let inventory = [];
-        
-        // Работа с таймером бонуса
+        let allAvailableItems = [];
+        for (let key in caseItems) { allAvailableItems = allAvailableItems.concat(caseItems[key]); }
+        allAvailableItems = allAvailableItems.filter((v,i,a)=>a.findIndex(t=>(t.name === v.name))===i);
+
+        let balance = 0, currentCaseId = null, spinAmount = 1, isSpinning = false, wonItemsBuffer = [], inventory = [];
+        let upInputItems = [], upTargetItem = null, upCurrentMultiplier = 0, selectionMode = 'input';
         let lastBonusTime = localStorage.getItem('lastBonusTime') ? parseInt(localStorage.getItem('lastBonusTime')) : 0;
         let bonusInterval = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCases();
-            updateBalance();
-            checkBonusStatus();
-        });
+        document.addEventListener('DOMContentLoaded', () => { renderCases(); updateBalance(); checkBonusStatus(); });
 
         function renderCases() {
-            const grid = document.getElementById('cases-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('cases-grid'); grid.innerHTML = '';
             casesData.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'case-card';
-                card.onclick = () => openCaseFullscreen(c.id);
-                card.innerHTML = `
-                    <img src="${c.img}" alt="${c.name}">
-                    <h3>${c.name}</h3>
-                    <div class="price">${c.price} ₽</div>
-                `;
+                const card = document.createElement('div'); card.className = 'case-card'; card.onclick = () => openCaseFullscreen(c.id);
+                card.innerHTML = `<img src="${c.img}" alt="${c.name}"><h3>${c.name}</h3><div class="price">${c.price} ₽</div>`;
                 grid.appendChild(card);
             });
         }
 
-        function updateBalance() {
-            document.getElementById('menu-balance-display').innerText = balance + ' ₽';
-        }
+        function updateBalance() { document.getElementById('menu-balance-display').innerText = balance + ' ₽'; }
 
-        // --- ЛОГИКА ПОПОЛНЕНИЯ РАЗ В ЧАС ---
         function checkBonusStatus() {
-            const btn = document.getElementById('deposit-btn');
-            const now = Date.now();
-            const cooldown = 60 * 60 * 1000; // 1 час
-
+            const btn = document.getElementById('deposit-btn'); const now = Date.now(); const cooldown = 60 * 60 * 1000; 
             if (now - lastBonusTime < cooldown) {
                 btn.disabled = true;
                 if (!bonusInterval) {
                     bonusInterval = setInterval(() => {
-                        const currentNow = Date.now();
-                        const remaining = cooldown - (currentNow - lastBonusTime);
-                        if (remaining <= 0) {
-                            clearInterval(bonusInterval);
-                            bonusInterval = null;
-                            checkBonusStatus();
-                        } else {
-                            const mins = Math.floor(remaining / 60000);
-                            const secs = Math.floor((remaining % 60000) / 1000);
+                        const currentNow = Date.now(); const remaining = cooldown - (currentNow - lastBonusTime);
+                        if (remaining <= 0) { clearInterval(bonusInterval); bonusInterval = null; checkBonusStatus(); } 
+                        else {
+                            const mins = Math.floor(remaining / 60000); const secs = Math.floor((remaining % 60000) / 1000);
                             btn.innerHTML = `⏳ <span>Ждать ${mins}:${secs.toString().padStart(2, '0')}</span>`;
                         }
                     }, 1000);
                 }
             } else {
-                btn.disabled = false;
-                btn.innerHTML = `💳 <span>Пополнить +300₽</span>`;
-                if (bonusInterval) {
-                    clearInterval(bonusInterval);
-                    bonusInterval = null;
-                }
+                btn.disabled = false; btn.innerHTML = `💳 <span>Пополнить +300₽</span>`;
+                if (bonusInterval) { clearInterval(bonusInterval); bonusInterval = null; }
             }
         }
 
         function claimBonus() {
-            const now = Date.now();
-            const cooldown = 60 * 60 * 1000;
-            
+            const now = Date.now(); const cooldown = 60 * 60 * 1000;
             if (now - lastBonusTime >= cooldown) {
-                balance += 300;
-                lastBonusTime = now;
-                localStorage.setItem('lastBonusTime', lastBonusTime);
-                updateBalance();
-                checkBonusStatus();
-                alert("Вам начислено 300 ₽! Следующее пополнение через час.");
+                balance += 300; lastBonusTime = now; localStorage.setItem('lastBonusTime', lastBonusTime);
+                updateBalance(); checkBonusStatus(); alert("Вам начислено 300 ₽! Следующее пополнение через час.");
             }
         }
 
-        // --- МЕНЮ И ИНВЕНТАРЬ ---
         function toggleMenu(e) {
             if(e) e.stopPropagation();
-            const menu = document.getElementById('side-menu');
-            const overlay = document.getElementById('overlay');
+            const menu = document.getElementById('side-menu'); const overlay = document.getElementById('overlay');
             menu.classList.toggle('open');
-            
-            if (menu.classList.contains('open')) {
-                overlay.classList.add('open');
-            } else {
-                overlay.classList.remove('open');
-            }
+            if (menu.classList.contains('open')) overlay.classList.add('open'); else overlay.classList.remove('open');
         }
 
-        function openInventory() {
-            toggleMenu();
-            document.getElementById('inventory-modal').style.display = 'flex';
-            renderInventory();
-        }
+        function openInventory() { toggleMenu(); document.getElementById('inventory-modal').style.display = 'flex'; renderInventory(); }
 
         function renderInventory() {
-            const grid = document.getElementById('inventory-grid');
-            const emptyMsg = document.getElementById('empty-inv-msg');
-            grid.innerHTML = '';
-
-            if (inventory.length === 0) {
-                emptyMsg.style.display = 'block';
-            } else {
+            const grid = document.getElementById('inventory-grid'); const emptyMsg = document.getElementById('empty-inv-msg'); grid.innerHTML = '';
+            if (inventory.length === 0) emptyMsg.style.display = 'block';
+            else {
                 emptyMsg.style.display = 'none';
                 inventory.forEach((item, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'inv-card';
-                    card.innerHTML = `
-                        <img src="${item.img}" alt="${item.name}">
-                        <div style="font-size:13px; font-weight:bold; margin-bottom:8px; text-align:center;">${item.name}</div>
-                        <button class="sell-btn" onclick="sellItem(${index})">Продать за ${item.price}₽</button>
-                    `;
+                    const card = document.createElement('div'); card.className = 'inv-card';
+                    card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div style="font-size:13px; font-weight:bold; margin-bottom:8px; text-align:center;">${item.name}</div><button class="sell-btn" onclick="sellItem(${index})">Продать за ${item.price}₽</button>`;
                     grid.appendChild(card);
                 });
             }
         }
 
-        function sellItem(index) {
-            balance += inventory[index].price;
-            inventory.splice(index, 1);
-            updateBalance();
-            renderInventory();
-        }
+        function sellItem(index) { balance += inventory[index].price; inventory.splice(index, 1); updateBalance(); renderInventory(); }
 
-        // --- ЭКРАН КЕЙСА ---
         function openCaseFullscreen(id) {
             if (isSpinning) return;
-            const c = casesData.find(x => x.id === id);
-            currentCaseId = id;
-            
-            document.getElementById('fs-case-img').src = c.img;
-            document.getElementById('fs-case-title').innerText = c.name;
+            const c = casesData.find(x => x.id === id); currentCaseId = id;
+            document.getElementById('fs-case-img').src = c.img; document.getElementById('fs-case-title').innerText = c.name;
             document.getElementById('fs-open-btn').innerText = `Открыть за ${c.price} ₽`;
-            
-            document.getElementById('fs-case-preview').style.display = 'flex';
-            document.getElementById('fs-controls').style.display = 'flex';
-            document.getElementById('roulette-wrapper').style.display = 'none';
-            document.getElementById('fs-items-container').style.display = 'flex';
-            
-            renderCaseItems();
-
-            document.getElementById('fs-page').style.display = 'flex';
+            document.getElementById('fs-case-preview').style.display = 'flex'; document.getElementById('fs-controls').style.display = 'flex';
+            document.getElementById('roulette-wrapper').style.display = 'none'; document.getElementById('fs-items-container').style.display = 'flex';
+            renderCaseItems(); document.getElementById('fs-page').style.display = 'flex';
             setAmount(1, { target: document.querySelectorAll('.amount-btn')[0] });
         }
 
         function renderCaseItems() {
-            const grid = document.getElementById('fs-items-grid');
-            grid.innerHTML = '';
-            
-            const items = caseItems[currentCaseId];
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Пока пусто...</p>';
-                return;
-            }
-
+            const grid = document.getElementById('fs-items-grid'); grid.innerHTML = ''; const items = caseItems[currentCaseId];
+            if (!items || items.length === 0) { grid.innerHTML = '<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Пока пусто...</p>'; return; }
             items.forEach(item => {
-                let rarityClass = 'common';
-                if (item.rarity === 'Редкий') rarityClass = 'rare';
-                if (item.rarity === 'Эпический') rarityClass = 'epic';
-
-                const card = document.createElement('div');
-                card.className = `ci-card ${rarityClass}`;
-                card.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}">
-                    <div class="ci-name">${item.name}</div>
-                    <div class="ci-price">${item.price} ₽</div>
-                    <div class="ci-chance">${item.chance}%</div>
-                `;
+                let rarityClass = 'common'; if (item.rarity === 'Редкий') rarityClass = 'rare'; if (item.rarity === 'Эпический') rarityClass = 'epic';
+                const card = document.createElement('div'); card.className = `ci-card ${rarityClass}`;
+                card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div class="ci-name">${item.name}</div><div class="ci-price">${item.price} ₽</div><div class="ci-chance">${item.chance}%</div>`;
                 grid.appendChild(card);
             });
         }
 
-        function closeFsPage() {
-            if (isSpinning) return;
-            document.getElementById('fs-page').style.display = 'none';
-        }
-
+        function closeFsPage() { if (isSpinning) return; document.getElementById('fs-page').style.display = 'none'; }
         function setAmount(amount, e) {
             if (isSpinning) return;
-            spinAmount = amount;
-            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+            spinAmount = amount; document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
             if(e && e.target) e.target.classList.add('active');
-            
-            const c = casesData.find(x => x.id === currentCaseId);
-            document.getElementById('fs-open-btn').innerText = `Открыть за ${c.price * spinAmount} ₽`;
+            const c = casesData.find(x => x.id === currentCaseId); document.getElementById('fs-open-btn').innerText = `Открыть за ${c.price * spinAmount} ₽`;
         }
 
-        // --- ЛОГИКА КРУТКИ ---
         function getRandomItem(itemsPool) {
-            let rand = Math.random() * 100;
-            let cumulative = 0;
-
-            for (let item of itemsPool) {
-                cumulative += (item.chance || 0);
-                if (rand <= cumulative) {
-                    return item;
-                }
-            }
+            let rand = Math.random() * 100, cumulative = 0;
+            for (let item of itemsPool) { cumulative += (item.chance || 0); if (rand <= cumulative) return item; }
             return itemsPool[itemsPool.length - 1];
         }
 
         function startSpin() {
             if (isSpinning) return;
-            const c = casesData.find(x => x.id === currentCaseId);
-            const totalCost = c.price * spinAmount;
-
-            if (balance < totalCost) {
-                alert("Недостаточно средств! Нажмите Пополнить в меню.");
-                return;
-            }
-
-            balance -= totalCost;
-            updateBalance();
-
-            isSpinning = true;
-            wonItemsBuffer = [];
-            
-            document.getElementById('fs-controls').style.display = 'none';
-            document.getElementById('fs-case-preview').style.display = 'none';
-            document.getElementById('fs-items-container').style.display = 'none';
-            
-            const wrapper = document.getElementById('roulette-wrapper');
-            wrapper.style.display = 'block';
-
-            const strip = document.getElementById('roulette-strip');
-            strip.innerHTML = '';
-            strip.style.transition = 'none';
-            strip.style.transform = 'translateX(0)';
-
+            const c = casesData.find(x => x.id === currentCaseId); const totalCost = c.price * spinAmount;
+            if (balance < totalCost) { alert("Недостаточно средств! Нажмите Пополнить в меню."); return; }
+            balance -= totalCost; updateBalance(); isSpinning = true; wonItemsBuffer = [];
+            document.getElementById('fs-controls').style.display = 'none'; document.getElementById('fs-case-preview').style.display = 'none'; document.getElementById('fs-items-container').style.display = 'none';
+            const wrapper = document.getElementById('roulette-wrapper'); wrapper.style.display = 'block';
+            const strip = document.getElementById('roulette-strip'); strip.innerHTML = ''; strip.style.transition = 'none'; strip.style.transform = 'translateX(0)';
             let itemsPool = JSON.parse(JSON.stringify(caseItems[currentCaseId] || [])); 
-
-            if (itemsPool.length === 0) {
-                itemsPool = [{ name: "Пусто", img: "https://via.placeholder.com/100/f8fafc/94a3b8?text=Empty", price: 0, chance: 100 }];
-            }
-
+            if (itemsPool.length === 0) itemsPool = [{ name: "Пусто", img: "https://via.placeholder.com/100/f8fafc/94a3b8?text=Empty", price: 0, chance: 100 }];
             const totalItems = 60;
             for (let i = 0; i < totalItems; i++) {
                 const randomItem = itemsPool[Math.floor(Math.random() * itemsPool.length)];
-                const div = document.createElement('div');
-                div.className = 'roulette-item';
-                div.innerHTML = `<img src="${randomItem.img}" alt="item">`;
-                strip.appendChild(div);
+                const div = document.createElement('div'); div.className = 'roulette-item'; div.innerHTML = `<img src="${randomItem.img}" alt="item">`; strip.appendChild(div);
             }
-
             const winIndex = 50; 
             for (let i = 0; i < spinAmount; i++) {
-                const wonItem = getRandomItem(itemsPool); 
-                wonItemsBuffer.push(wonItem);
-                if(i === 0) {
-                    strip.children[winIndex].innerHTML = `<img src="${wonItem.img}" alt="item">`;
-                }
+                const wonItem = getRandomItem(itemsPool); wonItemsBuffer.push(wonItem);
+                if(i === 0) strip.children[winIndex].innerHTML = `<img src="${wonItem.img}" alt="item">`;
             }
-
-            const itemWidth = 130;
-            const containerWidth = wrapper.offsetWidth;
-            const centerOffset = containerWidth / 2;
+            const itemWidth = 130, containerWidth = wrapper.offsetWidth, centerOffset = containerWidth / 2;
             const targetX = (winIndex * itemWidth) + (itemWidth / 2) - centerOffset;
-
-            setTimeout(() => {
-                strip.style.transition = 'transform 6s cubic-bezier(0.1, 0.9, 0.1, 1)';
-                strip.style.transform = `translateX(-${targetX}px)`;
-            }, 50);
-
-            setTimeout(() => {
-                showWinScreen();
-            }, 6200);
+            setTimeout(() => { strip.style.transition = 'transform 6s cubic-bezier(0.1, 0.9, 0.1, 1)'; strip.style.transform = `translateX(-${targetX}px)`; }, 50);
+            setTimeout(() => { showWinScreen(); }, 6200);
         }
 
-        // --- ЭКРАН ВЫИГРЫША ---
         function showWinScreen() {
-            const winModal = document.getElementById('win-modal');
-            const container = document.getElementById('win-items-container');
-            container.innerHTML = '';
-
+            const winModal = document.getElementById('win-modal'); const container = document.getElementById('win-items-container'); container.innerHTML = '';
             wonItemsBuffer.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'win-item-card';
-                
-                let borderColor = 'var(--border-color)';
-                if (item.rarity === 'Редкий') borderColor = 'var(--rarity-rare)';
-                if (item.rarity === 'Эпический') borderColor = 'var(--rarity-epic)';
-
+                const card = document.createElement('div'); card.className = 'win-item-card';
+                let borderColor = 'var(--border-color)'; if (item.rarity === 'Редкий') borderColor = 'var(--rarity-rare)'; if (item.rarity === 'Эпический') borderColor = 'var(--rarity-epic)';
                 card.style.borderColor = borderColor;
-
-                card.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}">
-                    <div class="win-item-name">${item.name}</div>
-                    <div class="win-item-price">${item.price} ₽</div>
-                `;
-                container.appendChild(card);
-                if (item.price > 0) inventory.push(item);
+                card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div class="win-item-name">${item.name}</div><div class="win-item-price">${item.price} ₽</div>`;
+                container.appendChild(card); if (item.price > 0) inventory.push(item);
             });
-            
-            winModal.style.display = 'flex';
-            createConfetti();
-
-            isSpinning = false;
-            document.getElementById('fs-case-preview').style.display = 'flex';
-            document.getElementById('fs-controls').style.display = 'flex';
-            document.getElementById('fs-items-container').style.display = 'flex';
-            document.getElementById('roulette-wrapper').style.display = 'none';
+            winModal.style.display = 'flex'; createConfetti();
+            isSpinning = false; document.getElementById('fs-case-preview').style.display = 'flex'; document.getElementById('fs-controls').style.display = 'flex'; document.getElementById('fs-items-container').style.display = 'flex'; document.getElementById('roulette-wrapper').style.display = 'none';
         }
 
         function createConfetti() {
             document.querySelectorAll('.confetti').forEach(el => el.remove());
             const colors = ['#3b82f6', '#60a5fa', '#f59e0b', '#fbbf24', '#10b981', '#a855f7'];
             for (let i = 0; i < 60; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.top = '-10px';
+                const confetti = document.createElement('div'); confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw'; confetti.style.top = '-10px';
                 confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.width = Math.random() * 8 + 6 + 'px';
-                confetti.style.height = Math.random() * 8 + 6 + 'px';
-                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.width = Math.random() * 8 + 6 + 'px'; confetti.style.height = Math.random() * 8 + 6 + 'px';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's'; confetti.style.animationDelay = Math.random() * 0.5 + 's';
                 document.getElementById('win-modal').appendChild(confetti);
             }
         }
 
-        function closeWinModal() {
-            document.getElementById('win-modal').style.display = 'none';
-            setAmount(1, { target: document.querySelectorAll('.amount-btn')[0] }); 
+        function closeWinModal() { document.getElementById('win-modal').style.display = 'none'; setAmount(1, { target: document.querySelectorAll('.amount-btn')[0] }); }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function openUpgrader() { toggleMenu(); document.getElementById('upgrader-page').style.display = 'flex'; resetUpgrader(); }
+        function closeUpgrader() { document.getElementById('upgrader-page').style.display = 'none'; }
+
+        function resetUpgrader() {
+            upInputItems = []; upTargetItem = null; upCurrentMultiplier = 0;
+            document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
+            renderUpSlots(); updateWheelVisuals();
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+        function renderUpSlots() {
+            const inputSlot = document.getElementById('up-slot-input'); const targetSlot = document.getElementById('up-slot-target');
+            if (upInputItems.length > 0) {
+                inputSlot.classList.add('filled');
+                inputSlot.innerHTML = `<div class="clear-slot" onclick="clearSlot('input', event)">×</div><img src="${upInputItems[0].img}" alt="${upInputItems[0].name}" title="Выбрано: ${upInputItems.length} шт.">${upInputItems.length > 1 ? `<div style="position:absolute; bottom:5px; right:5px; background:var(--accent-blue); color:#fff; border-radius:50%; width:20px; height:20px; font-size:12px; display:flex; justify-content:center; align-items:center; font-weight:bold;">${upInputItems.length}</div>` : ''}`;
+            } else { inputSlot.classList.remove('filled'); inputSlot.innerHTML = '+'; }
+            if (upTargetItem) {
+                targetSlot.classList.add('filled');
+                targetSlot.innerHTML = `<div class="clear-slot" onclick="clearSlot('target', event)">×</div><img src="${upTargetItem.img}" alt="${upTargetItem.name}">`;
+            } else { targetSlot.classList.remove('filled'); targetSlot.innerHTML = '+'; }
+            updateWheelVisuals();
+        }
+
+        function clearSlot(type, e) {
+            if(e) e.stopPropagation();
+            if (type === 'input') upInputItems = [];
+            if (type === 'target') upTargetItem = null;
+            renderUpSlots();
+        }
+
+        function openItemSelection(mode) {
+            selectionMode = mode; const modal = document.getElementById('up-selection-modal'); const grid = document.getElementById('up-selection-grid'); const title = document.getElementById('up-selection-title');
+            grid.innerHTML = ''; modal.style.display = 'flex';
+            if (mode === 'input') {
+                title.innerText = "Выберите подарки из инвентаря";
+                if (inventory.length === 0) { grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#fff;">Инвентарь пуст. Откройте кейсы!</p>'; return; }
+                inventory.forEach((item, index) => {
+                    const card = document.createElement('div'); card.className = 'inv-card'; card.style.cursor = 'pointer'; card.onclick = () => addInputItem(index);
+                    card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div style="font-size:12px; text-align:center;">${item.name}</div><div style="color:var(--gold); font-weight:bold; font-size:12px;">${item.price} ₽</div>`;
+                    grid.appendChild(card);
+                });
+            } else {
+                title.innerText = "Выберите желаемый подарок";
+                allAvailableItems.forEach(item => {
+                    if (upInputItems.find(i => i.name === item.name)) return;
+                    const card = document.createElement('div'); card.className = 'inv-card'; card.style.cursor = 'pointer'; card.onclick = () => selectTargetItem(item);
+                    card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div style="font-size:12px; text-align:center;">${item.name}</div><div style="color:var(--gold); font-weight:bold; font-size:12px;">${item.price} ₽</div>`;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function addInputItem(inventoryIndex) {
+            if (upInputItems.length >= 6) { alert("Максимум 6 предметов!"); return; }
+            const item = inventory[inventoryIndex]; upInputItems.push(item); inventory.splice(inventoryIndex, 1);
+            closeModal('up-selection-modal'); renderUpSlots();
+        }
+
+        function selectTargetItem(item) { upTargetItem = item; closeModal('up-selection-modal'); renderUpSlots(); }
+
+        function setUpMultiplier(mult, e) {
+            upCurrentMultiplier = mult; document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
+            if(e) e.target.classList.add('active'); updateWheelVisuals();
+        }
+
+        function updateWheelVisuals() {
+            const wheelBg = document.getElementById('up-wheel-bg'); const chanceText = document.getElementById('up-chance-text'); const wheelImg = document.getElementById('up-wheel-img');
+            let chance = 0;
+            if (upTargetItem) { wheelImg.src = upTargetItem.img; wheelImg.style.opacity = 1; } 
+            else { wheelImg.src = "https://via.placeholder.com/100/1e293b/64748b?text=?"; wheelImg.style.opacity = 0.5; }
+            if (upInputItems.length > 0 && upTargetItem && upCurrentMultiplier > 0) {
+                const inputSum = upInputItems.reduce((sum, item) => sum + item.price, 0); const targetPrice = upTargetItem.price;
+                chance = (inputSum / (targetPrice * upCurrentMultiplier)) * 100;
+                if (chance > 99) chance = 99; if (chance < 1) chance = 1;
+                chanceText.innerText = chance.toFixed(1) + "%";
+                wheelBg.style.background = `conic-gradient(from 0deg, var(--accent-blue) 0%, var(--accent-blue) ${chance}%, #1e293b ${chance}%, #1e293b 100%)`;
+            } else {
+                chanceText.innerText = "0%";
+                wheelBg.style.background = `conic-gradient(from 0deg, #3b82f6 0%, #3b82f6 0%, #1e293b 0%, #1e293b 100%)`;
+            }
+        }
+
+        function startUpgrade() {
+            if (!upTargetItem) { alert("Выберите желаемый предмет справа!"); return; }
+            if (upInputItems.length === 0) { alert("Добавьте предметы для апгрейда слева!"); return; }
+            if (upCurrentMultiplier === 0) { alert("Выберите множитель (x2, x3 и т.д.)!"); return; }
+            const inputSum = upInputItems.reduce((sum, item) => sum + item.price, 0); const targetPrice = upTargetItem.price; const requiredValue = targetPrice * upCurrentMultiplier;
+            if (inputSum < requiredValue) { alert("Сумма ваших предметов слишком мала для такого множителя! Выберите другой множитель или предметы."); return; }
+            let chance = (inputSum / requiredValue) * 100; if (chance > 99) chance = 99;
+            const btn = document.querySelector('.up-action-btn'); btn.disabled = true; btn.innerText = "КРУТИМ...";
+            let ticks = 0;
+                        const tickInterval = setInterval(() => {
+                const randomChance = Math.random() * 100;
+                document.getElementById('up-chance-text').innerText = randomChance.toFixed(1) + "%";
+                document.getElementById('up-wheel-bg').style.background = `conic-gradient(from 0deg, var(--accent-blue) 0%, var(--accent-blue) ${randomChance}%, #1e293b ${randomChance}%, #1e293b 100%)`;
+                ticks++;
+                if (ticks > 20) {
+                    clearInterval(tickInterval);
+                    finishUpgrade(chance);
+                }
+            }, 100);
+        }
+
+        function finishUpgrade(winChance) {
+            const roll = Math.random() * 100;
+            const isWin = roll <= winChance;
+
+            const btn = document.querySelector('.up-action-btn');
+            btn.disabled = false;
+            btn.innerText = "Прокачать";
+
+            updateWheelVisuals();
+
+            if (isWin) {
+                inventory.push(upTargetItem);
+                wonItemsBuffer = [upTargetItem];
+                showWinScreen();
+
+                upInputItems = [];
+                upTargetItem = null;
+                upCurrentMultiplier = 0;
+                document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
+                renderUpSlots();
+            } else {
+                alert("Апгрейд не удался! Ваши предметы сгорели.");
+
+                upInputItems = [];
+                upTargetItem = null;
+                upCurrentMultiplier = 0;
+                document.querySelectorAll('.up-mult-btn').forEach(btn => btn.classList.remove('active'));
+                renderUpSlots();
+            }
         }
     </script>
 </body>
