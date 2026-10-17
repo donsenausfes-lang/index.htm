@@ -9,7 +9,6 @@
             --bg-main: #070a13;
             --bg-panel: #0f1526;
             --accent-blue: #3b82f6;
-            --accent-blue-light: #60a5fa;
             --accent-glow: rgba(59, 130, 246, 0.6);
             --text-main: #ffffff;
             --text-muted: #8b9bb4;
@@ -27,7 +26,6 @@
             overflow-x: hidden;
         }
 
-        /* --- Шапка --- */
         header {
             width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(59, 130, 246, 0.1); background-color: rgba(7, 10, 19, 0.8);
@@ -43,7 +41,6 @@
             border-radius: 2px; transition: 0.3s; box-shadow: 0 0 5px var(--accent-glow);
         }
 
-        /* Боковое меню */
         .side-menu {
             position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: var(--bg-panel);
             z-index: 150; transition: 0.3s; border-left: 1px solid var(--border-color);
@@ -69,7 +66,6 @@
         }
         .menu-btn:hover { background: var(--accent-blue); color: #fff; box-shadow: 0 0 15px var(--accent-glow); }
 
-        /* --- Сетка кейсов --- */
         .page-content { padding: 30px 20px; max-width: 1000px; margin: 0 auto; }
         .page-title { text-align: center; font-size: 22px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; }
         
@@ -87,8 +83,9 @@
         }
         
         .case-card img {
-            width: 100%; max-width: 180px; height: 180px; object-fit: contain; margin-bottom: 10px;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 1;
+            width: 100%; max-width: 160px; height: 160px; object-fit: contain; margin-bottom: 10px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); z-index: 1;
+            mix-blend-mode: darken;
         }
         
         .case-card h3 { font-size: 16px; margin-bottom: 5px; text-transform: uppercase; z-index: 1; text-shadow: 0 2px 5px #000; }
@@ -98,7 +95,6 @@
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
         }
 
-        /* --- Полноэкранный просмотр кейса --- */
         .fullscreen-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-main);
             z-index: 100; display: none; flex-direction: column; align-items: center;
@@ -113,11 +109,10 @@
         }
         .fs-case-img {
             width: 250px; height: 250px; object-fit: contain; filter: drop-shadow(0 0 30px var(--accent-glow));
-            transition: transform 0.3s;
+            mix-blend-mode: darken;
         }
         .fs-case-title { font-size: 28px; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* --- Выбор количества и кнопка --- */
         .controls-area { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 50px; }
         .amount-selector { display: flex; gap: 5px; background: var(--bg-panel); padding: 5px; border-radius: 10px; border: 1px solid var(--border-color); }
         .amount-btn {
@@ -135,7 +130,6 @@
         }
         .open-btn:hover { transform: scale(1.05); box-shadow: 0 5px 30px rgba(59, 130, 246, 0.8); }
 
-        /* --- Рулетка --- */
         .roulette-wrapper {
             width: 100%; max-width: 900px; height: 150px; background: var(--bg-panel);
             border-top: 2px solid var(--accent-blue); border-bottom: 2px solid var(--accent-blue);
@@ -147,13 +141,12 @@
             width: 130px; height: 100%; flex-shrink: 0; display: flex; justify-content: center; align-items: center;
             border-right: 1px solid var(--border-color); background: #141c2e; padding: 10px;
         }
-        .roulette-item img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 5px 10px #000); }
+        .roulette-item img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 5px 10px #000); mix-blend-mode: darken; }
         .roulette-pointer {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%;
             background: var(--gold); z-index: 10; box-shadow: 0 0 20px var(--gold), 0 0 40px var(--gold);
         }
 
-        /* --- Модалки (Пополнение, Инвентарь, Выигрыш) --- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(7, 10, 19, 0.9); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(5px);
@@ -174,15 +167,13 @@
         }
         .submit-btn:hover { background: #2563eb; }
         
-        /* Инвентарь */
         .inv-modal .modal-content { max-width: 600px; }
         .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
         .inv-card { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .inv-card img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 10px; }
+        .inv-card img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 10px; mix-blend-mode: darken; }
         .inv-card .sell-btn { background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue); width: 100%; padding: 5px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .inv-card .sell-btn:hover { background: var(--accent-blue); color: #fff; }
 
-        /* Окно выигрыша */
         .win-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 300; justify-content: center; align-items: center; flex-direction: column;
@@ -196,7 +187,7 @@
             border: 2px solid var(--accent-blue); border-radius: 12px; padding: 20px; width: 160px;
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); position: relative;
         }
-        .win-item-card img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--accent-glow)); }
+        .win-item-card img { width: 100%; height: 100px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--accent-glow)); mix-blend-mode: darken; }
         .win-item-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .win-item-price { color: var(--gold); font-weight: bold; font-size: 16px; }
         
@@ -207,7 +198,6 @@
         .close-win-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
 
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
         .confetti { position: absolute; width: 10px; height: 10px; background: var(--gold); animation: fall linear forwards; z-index: 299; border-radius: 50%; }
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
     </style>
@@ -223,7 +213,6 @@
         </div>
     </header>
 
-    <!-- Боковое меню -->
     <div class="side-menu" id="side-menu">
         <div class="menu-header">
             <span style="font-weight:bold; font-size:20px;">Меню</span>
@@ -239,7 +228,6 @@
         <div class="cases-grid" id="cases-grid"></div>
     </div>
 
-    <!-- Полноэкранный экран кейса -->
     <div class="fullscreen-page" id="fs-page">
         <div class="close-fs" onclick="closeFsPage()">×</div>
         
@@ -265,7 +253,6 @@
         </div>
     </div>
 
-    <!-- Модалка пополнения -->
     <div class="modal" id="deposit-modal">
         <div class="modal-content">
             <h2>Пополнение баланса</h2>
@@ -275,7 +262,6 @@
         </div>
     </div>
 
-    <!-- Модалка инвентаря -->
     <div class="modal inv-modal" id="inventory-modal">
         <div class="modal-content">
             <h2>🎒 Ваш Инвентарь</h2>
@@ -285,7 +271,6 @@
         </div>
     </div>
 
-    <!-- Окно выигрыша -->
     <div class="win-modal" id="win-modal">
         <div class="win-content">
             <div class="win-title">ПОБЕДА!</div>
@@ -300,7 +285,7 @@
             { id: 3, name: "Мелочь", price: 249, img: "https://i.ibb.co/nNyPRypn/In-Shot-20261017-162647410.jpg" },
             { id: 4, name: "Стандарт", price: 499, img: "https://i.ibb.co/RTmX1wFT/In-Shot-20261017-163301294.jpg" },
             { id: 5, name: "Черный", price: 999, img: "https://i.ibb.co/V0CGvcnV/In-Shot-20261017-163812675.jpg" },
-            { id: 6, name: "Ценный", price: 2299, img: "https://i.ibb.co/MkQfzWB4/In-Shot-20261017-162333547.jpg" } // Заглушка
+            { id: 6, name: "Ценный", price: 2299, img: "https://i.ibb.co/MkQfzWB4/In-Shot-20261017-162333547.jpg" }
         ];
 
         const caseItems = {
@@ -312,7 +297,7 @@
         let spinAmount = 1;
         let isSpinning = false;
         let wonItemsBuffer = [];
-        let inventory = []; // Массив для хранения предметов
+        let inventory = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             renderCases();
@@ -339,13 +324,11 @@
             document.getElementById('menu-balance-display').innerText = balance + ' ₽';
         }
 
-        // --- МЕНЮ ---
         function toggleMenu(e) {
             if(e) e.stopPropagation();
             document.getElementById('side-menu').classList.toggle('open');
         }
         
-        // Закрытие меню при клике мимо
         document.addEventListener('click', (e) => {
             const menu = document.getElementById('side-menu');
             const burger = document.querySelector('.burger-menu');
@@ -354,7 +337,6 @@
             }
         });
 
-        // --- ПОПОЛНЕНИЕ ---
         function openDepositModal() {
             document.getElementById('side-menu').classList.remove('open');
             document.getElementById('deposit-modal').style.display = 'flex';
@@ -372,7 +354,6 @@
             closeModal('deposit-modal');
         }
 
-        // --- ИНВЕНТАРЬ ---
         function openInventory() {
             document.getElementById('side-menu').classList.remove('open');
             document.getElementById('inventory-modal').style.display = 'flex';
@@ -408,7 +389,6 @@
             renderInventory();
         }
 
-        // --- ЭКРАН КЕЙСА ---
         function openCaseFullscreen(id) {
             if (isSpinning) return;
             const c = casesData.find(x => x.id === id);
@@ -440,7 +420,6 @@
             document.getElementById('fs-open-btn').innerText = `Открыть за ${c.price * spinAmount} ₽`;
         }
 
-        // --- ПРОКРУТКА ---
         function startSpin() {
             if (isSpinning) return;
             const c = casesData.find(x => x.id === currentCaseId);
@@ -507,7 +486,6 @@
             }, 6200);
         }
 
-        // --- ЭКРАН ВЫИГРЫША ---
         function showWinScreen() {
             const winModal = document.getElementById('win-modal');
             const container = document.getElementById('win-items-container');
@@ -522,8 +500,6 @@
                     <div class="win-item-price">${item.price} ₽</div>
                 `;
                 container.appendChild(card);
-                
-                // Кидаем в инвентарь!
                 if (item.price > 0) inventory.push(item);
             });
             
@@ -538,9 +514,7 @@
         }
 
         function createConfetti() {
-            // Очищаем старые конфетти
             document.querySelectorAll('.confetti').forEach(el => el.remove());
-            
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
