@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA$E BATTLE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Шапка -->
+    <header>
+        <div class="logo">CA$E BATTLE</div>
+        <div class="header-controls">
+            <button class="wallet-btn" onclick="claimBonus()">💳 +300₽</button>
+            <div class="balance" id="balance-display">0 ₽</div>
+            <button class="nav-btn" onclick="openInventory()">🎒 Инвентарь</button>
+        </div>
+    </header>
+
+    <!-- Главная страница (Кейсы) -->
+    <div class="page-content">
+        <h1 class="page-title">Серийные кейсы</h1>
+        <div class="cases-grid" id="cases-grid">
+            <!-- JS заполнит -->
+        </div>
+    </div>
+
+    <!-- Модалка: Просмотр кейса и рулетка -->
+    <div class="modal" id="case-modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('case-modal')">×</button>
+            <div class="case-view">
+                <h2 id="modal-case-name">Кейс</h2>
+                <img id="modal-case-img" src="" alt="Case">
+                
+                <!-- Контейнер для рулетки (скрыт, пока не начали) -->
+                <div class="roulette-container" id="roulette-container" style="display: none;">
+                    <div class="roulette-pointer"></div>
+                    <div class="roulette-strip" id="roulette-strip"></div>
+                </div>
+
+                <div id="result-text" style="margin-top: 20px; font-size: 20px; color: var(--accent-blue); font-weight: bold; display: none;"></div>
+
+                <button class="open-btn" id="modal-open-btn" onclick="spinRoulette()">Открыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка: Инвентарь -->
+    <div class="modal" id="inventory-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="close-btn" onclick="closeModal('inventory-modal')">×</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">Ваш Инвентарь</h2>
+            <div class="inventory-grid" id="inventory-grid">
+                <!-- JS заполнит -->
+            </div>
+            <p id="empty-inv-msg" style="text-align: center; color: var(--text-muted); margin-top: 20px;">Инвентарь пуст...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+  </html>
+  :root {
+    --bg-black: #070a13;
+    --bg-panel: #0f1526;
+    --accent-blue: #3b82f6;
+    --accent-blue-glow: rgba(59, 130, 246, 0.4);
+    --text-main: #ffffff;
+    --text-muted: #7a8ba3;
+    --border-color: #1e2a45;
+    --green: #22c55e;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-black);
+    background-image: radial-gradient(circle at top, #111a30 0%, var(--bg-black) 60%);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* --- Шапка --- */
+header {
+    width: 100%;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(7, 10, 19, 0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--accent-blue);
+    letter-spacing: 1px;
+    text-shadow: 0 0 15px var(--accent-blue-glow);
+    font-style: italic;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.wallet-btn {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid var(--accent-blue);
+    color: var(--accent-blue);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.wallet-btn:hover {
+    background-color: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 0 15px var(--accent-blue-glow);
+}
+
+.balance {
+    background-color: var(--bg-panel);
+    padding: 8px 15px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-weight: bold;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    color: var(--accent-blue);
+}
+
+/* --- Основной экран (Кейсы) --- */
+.page-content {
+    padding: 30px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 22px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+.cases-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .cases-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.case-card {
+    background-color: var(--bg-panel);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.case-card:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    transform: translateY(-5px);
+}
+
+.case-card img {
+    width: 100%;
+    max-width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+}
+
+.case-card h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.case-card .price {
+    color: var(--accent-blue);
+    font-weight: bold;
+    font-size: 16px;
+    background-color: rgba(59, 130, 246, 0.1);
+    padding: 5px 15px;
+    border-radius: 5px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* --- Модалки --- */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(7, 10, 19, 0.95);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--bg-black);
+    border: 1px solid var(--border-color);
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+}
+.close-btn:hover { color: #fff; }
+
+/* --- Внутри кейса --- */
+.case-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.case-view img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px var(--accent-blue-glow));
+}
+
+.open-btn {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 2px solid var(--accent-blue);
+    color: var(--accent-blue);
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 15px;
+    text-transform: uppercase;
+}
+
+.open-btn:hover {
+    background-color: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 0 25px var(--accent-blue-glow);
+}
+
+.open-btn:disabled {
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+    background: transparent;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* --- Рулетка --- */
+.roulette-container {
+    width: 100%;
+    height: 120px;
+    background-color: var(--bg-panel);
+    border: 2px solid var(--accent-blue);
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px var(--accent-blue-glow);
+}
+
+.roulette-strip {
+    display: flex;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    transition: transform 5s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+
+.roulette-item {
+    width: 120px;
+    height: 100%;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid var(--border-color);
+    background-color: var(--bg-panel);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 5px;
+}
+
+.roulette-item img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.roulette-pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background-color: #fff;
+    z-index: 10;
+    box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-blue);
+}
+
+/* --- Инвентарь --- */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.inv-item {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inv-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.inv-item .sell-btn {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid var(--accent-blue);
+    color: var(--accent-blue);
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.inv-item .sell-btn:hover {
+    background-color: var(--accent-blue);
+    color: #fff;
+}
+
+/* Скроллбар */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-black); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+// --- ДАННЫЕ ---
+// Картинки кейсов (взял прямые ссылки из твоих превью)
+const casesData = [
+    { id: 1, name: "Начальный", price: 49, img: "https://i.ibb.co/y740rhw/In-Shot-20261017-155827018.jpg" },
+    { id: 2, name: "Барахло", price: 129, img: "https://i.ibb.co/MkQfzWB4/In-Shot-20261017-162333547.jpg" },
+    { id: 3, name: "Мелочь", price: 249, img: "https://i.ibb.co/nNyPRypn/In-Shot-20261017-162647410.jpg" },
+    { id: 4, name: "Стандарт", price: 499, img: "https://i.ibb.co/RTmX1wFT/In-Shot-20261017-163301294.jpg" },
+    { id: 5, name: "Черный", price: 999, img: "https://i.ibb.co/V0CGvcnV/In-Shot-20261017-163812675.jpg" },
+    { id: 6, name: "Ценный", price: 2299, img: "https://i.ibb.co/MkQfzWB4/In-Shot-20261017-162333547.jpg" } // Заглушка для 6-го, т.к. ссылка сломалась
+];
+
+// Наполнитель (пока только для первого кейса)
+const caseItems = {
+    1: [
+        { name: "Spring Grove", img: "https://i.ibb.co/60TBqPxv/Spring-Grove.webp", price: 19, chance: 100 } // 21% был, но пока это единственный предмет, ставим 100%, иначе будет пусто
+    ]
+};
+
+// Состояние игры
+let balance = 0;
+let inventory = [];
+let lastBonusTime = 0;
+let currentCaseId = null;
+let isSpinning = false;
+
+// --- ИНИЦИАЛИЗАЦИЯ ---
+document.addEventListener('DOMContentLoaded', () => {
+    renderCases();
+    updateBalance();
+    checkBonusTimer();
+});
+
+// --- РЕНДЕР КЕЙСОВ ---
+function renderCases() {
+    const grid = document.getElementById('cases-grid');
+    grid.innerHTML = '';
+    casesData.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'case-card';
+        card.onclick = () => openCase(c.id);
+        card.innerHTML = `
+            <img src="${c.img}" alt="${c.name}">
+            <h3>${c.name}</h3>
+            <div class="price">${c.price} ₽</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// --- УПРАВЛЕНИЕ БАЛАНСОМ ---
+function updateBalance() {
+    document.getElementById('balance-display').innerText = balance + ' ₽';
+}
+
+function claimBonus() {
+    const now = Date.now();
+    const cooldown = 60 * 60 * 1000; // 1 час
+
+    if (now - lastBonusTime < cooldown) {
+        const remaining = Math.ceil((cooldown - (now - lastBonusTime)) / 60000);
+        alert(`Бонус доступен через ${remaining} мин.`);
+        return;
+    }
+
+    balance += 300;
+    lastBonusTime = now;
+    updateBalance();
+    alert("Баланс пополнен на 300 ₽!");
+    checkBonusTimer();
+}
+
+// Визуально показываем, что кнопка бонуса неактивна
+function checkBonusTimer() {
+    const btn = document.querySelector('.wallet-btn');
+    const now = Date.now();
+    if (now - lastBonusTime < 60 * 60 * 1000) {
+        btn.style.opacity = '0.5';
+        btn.innerText = '⏳ Ждите';
+    } else {
+        btn.style.opacity = '1';
+        btn.innerText = '💳 +300₽';
+    }
+}
+
+// --- ОТКРЫТИЕ КЕЙСА ---
+function openCase(id) {
+    if (isSpinning) return;
+    const c = casesData.find(x => x.id === id);
+    currentCaseId = id;
+    
+    document.getElementById('modal-case-name').innerText = c.name;
+    document.getElementById('modal-case-img').src = c.img;
+    document.getElementById('modal-open-btn').innerText = `Открыть за ${c.price} ₽`;
+    document.getElementById('modal-open-btn').disabled = false;
+    
+    document.getElementById('roulette-container').style.display = 'none';
+    document.getElementById('result-text').style.display = 'none';
+    document.getElementById('modal-case-img').style.display = 'block';
+    
+    document.getElementById('case-modal').style.display = 'flex';
+}
+
+// --- КРУТКА РУЛЕТКИ ---
+function spinRoulette() {
+    if (isSpinning) return;
+    const c = casesData.find(x => x.id === currentCaseId);
+    
+    if (balance < c.price) {
+        alert("Недостаточно средств!");
+        return;
+    }
+
+    // Списываем баланс
+    balance -= c.price;
+    updateBalance();
+
+    isSpinning = true;
+    const btn = document.getElementById('modal-open-btn');
+    btn.disabled = true;
+    btn.innerText = 'Крутится...';
+    
+    document.getElementById('modal-case-img').style.display = 'none';
+    document.getElementById('roulette-container').style.display = 'block';
+    document.getElementById('result-text').style.display = 'none';
+
+    const strip = document.getElementById('roulette-strip');
+    strip.innerHTML = '';
+    
+    // Получаем предметы для этого кейса. Если пусто - заглушка
+    let itemsPool = caseItems[currentCaseId];
+    if (!itemsPool || itemsPool.length === 0) {
+        itemsPool = [{ name: "Пусто", img: "", price: 0, chance: 100 }];
+    }
+
+    // Генерируем ленту (40 элементов)
+    for (let i = 0; i < 40; i++) {
+        const randomItem = itemsPool[Math.floor(Math.random() * itemsPool.length)];
+        const div = document.createElement('div');
+        div.className = 'roulette-item';
+        if(randomItem.img) {
+            div.innerHTML = `<img src="${randomItem.img}" alt="item">`;
+        } else {
+            div.innerHTML = `<span>${randomItem.name}</span>`;
+        }
+        strip.appendChild(div);
+    }
+
+    // Выбираем победителя (пока берем первый предмет из пула)
+    const winner = itemsPool[0]; 
+    
+    // Заменяем 35-й элемент на победителя
+    const winIndex = 35; 
+    const winElement = strip.children[winIndex];
+    if(winner.img) {
+        winElement.innerHTML = `<img src="${winner.img}" alt="item">`;
+    } else {
+        winElement.innerHTML = `<span>${winner.name}</span>`;
+    }
+
+    // Анимация
+    const containerWidth = document.querySelector('.roulette-container').offsetWidth;
+    const itemWidth = 120;
+    const centerOffset = containerWidth / 2;
+    const targetX = (winIndex * itemWidth) + (itemWidth / 2) - centerOffset;
+
+    // Сброс позиции
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateX(0)';
+
+    setTimeout(() => {
+        strip.style.transition = 'transform 5s cubic-bezier(0.1, 0.9, 0.1, 1)';
+        strip.style.transform = `translateX(-${targetX}px)`;
+    }, 50);
+
+    // Завершение
+    setTimeout(() => {
+        document.getElementById('result-text').innerText = `Вы выиграли: ${winner.name} (${winner.price} ₽)`;
+        document.getElementById('result-text').style.display = 'block';
+        
+        if (winner.price > 0) {
+            inventory.push(winner);
+        }
+        
+        isSpinning = false;
+        btn.disabled = false;
+        btn.innerText = `Открыть еще за ${c.price} ₽`;
+    }, 5100);
+}
+
+// --- ИНВЕНТАРЬ ---
+function openInventory() {
+    renderInventory();
+    document.getElementById('inventory-modal').style.display = 'flex';
+}
+
+function renderInventory() {
+    const grid = document.getElementById('inventory-grid');
+    const emptyMsg = document.getElementById('empty-inv-msg');
+    grid.innerHTML = '';
+    
+    if (inventory.length === 0) {
+        emptyMsg.style.display = 'block';
+    } else {
+        emptyMsg.style.display = 'none';
+        inventory.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'inv-item';
+            div.innerHTML = `
+                <img src="${item.img}" alt="${item.name}">
+                <div style="font-size: 12px; margin-bottom: 5px; text-align: center;">${item.name}</div>
+                <button class="sell-btn" onclick="sellItem(${index})">Продать за ${item.price}₽</button>
+            `;
+            grid.appendChild(div);
+        });
+    }
+}
+
+function sellItem(index) {
+    const item = inventory[index];
+    balance += item.price;
+    inventory.splice(index, 1);
+    updateBalance();
+    renderInventory();
+}
+
+// --- УТИЛИТЫ ---
+function closeModal(id) {
+    if(isSpinning && id === 'case-modal') return; // Не даем закрыть во время крутки
+    document.getElementById(id).style.display = 'none';
+}
+      
